@@ -47,6 +47,28 @@ importers:
 
   packages/eslint-config: {}
 
+  packages/sdk:
+    dependencies:
+      '@make-video/shared':
+        specifier: workspace:*
+        version: link:../shared
+    devDependencies:
+      '@make-video/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@make-video/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+
+  packages/shared:
+    devDependencies:
+      '@make-video/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@make-video/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+
   packages/tsconfig: {}
 
 packages:
@@ -2640,7 +2662,7 @@ snapshots:
       debug: 4.4.3
       eslint: 9.39.4
       eslint-scope: 8.4.0
-      eslint-visitor-keys: 4.2.1
+      eslint-visitor-keys: 5.0.1
       espree: 10.4.0
       esquery: 1.7.0
       semver: 7.7.4

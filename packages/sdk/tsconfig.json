@@ -1,0 +1,7 @@
+{
+  "extends": "@make-video/tsconfig/library",
+  "compilerOptions": {
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*.ts"]
+}
