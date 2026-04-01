@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
+    "@make-video/shared": "workspace:*",
     "@make-video/sdk": "workspace:*",
     "naive-ui": "^2.43.1",
     "pinia": "^3.0.3",
@@ -21,6 +22,9 @@
     "vue-tsc": "^3.1.1"
   },
   "scripts": {
+    "prebuild": "pnpm --filter @make-video/shared build && pnpm --filter @make-video/sdk build",
+    "pretypecheck": "pnpm --filter @make-video/shared build && pnpm --filter @make-video/sdk build",
+    "pretest": "pnpm --filter @make-video/shared build && pnpm --filter @make-video/sdk build",
     "build": "vue-tsc --noEmit && vite build",
     "dev": "vite",
     "lint": "eslint .",

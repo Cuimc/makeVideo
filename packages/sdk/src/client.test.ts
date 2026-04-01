@@ -1,33 +1,58 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createApiClient } from './client';
+import { createSdkClient } from './client';
 
-describe('createApiClient', () => {
-  it('requests the backend health endpoint and returns the parsed payload', async () => {
-    const fetcher = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          status: 'ok',
-          service: 'make-video-server',
-          timestamp: '2026-04-01T00:00:00.000Z',
-        }),
-        {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-          },
+describe('createSdkClient', () => {
+  it('injects bearer token when getToken returns value', async () => {
+    const transport = vi.fn().mockResolvedValue({
+      data: {
+        code: 0,
+        message: 'ok',
+        data: {
+          pointBalance: 2680,
+          recentProjectCount: 4,
+          recentVideoCount: 6,
+          recentProjects: [],
+          recentVideos: [],
         },
-      ),
-    );
-
-    const client = createApiClient({
-      baseUrl: 'http://127.0.0.1:3000',
-      fetcher,
+      },
     });
 
-    const payload = await client.getHealth();
+    const client = createSdkClient({
+      baseUrl: 'http://example.com',
+      getToken: () => 'token-1',
+      transport,
+    });
 
-    expect(fetcher).toHaveBeenCalledWith('http://127.0.0.1:3000/api/health');
-    expect(payload.status).toBe('ok');
-    expect(payload.service).toBe('make-video-server');
+    await client.dashboard.getSummary();
+
+    expect(transport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: 'Bearer token-1',
+        }),
+      }),
+    );
+  });
+
+  it('invokes unauthorized callback on 401 responses', async () => {
+    const onUnauthorized = vi.fn();
+    const transport = vi.fn().mockRejectedValue({
+      response: {
+        status: 401,
+        data: {
+          code: 401,
+          message: 'unauthorized',
+        },
+      },
+    });
+
+    const client = createSdkClient({
+      baseUrl: 'http://example.com',
+      onUnauthorized,
+      transport,
+    });
+
+    await expect(client.dashboard.getSummary()).rejects.toThrow('unauthorized');
+    expect(onUnauthorized).toHaveBeenCalledTimes(1);
   });
 });

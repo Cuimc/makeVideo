@@ -1,29 +1,48 @@
-import { isHealthResponse, type HealthResponse } from '@make-video/shared';
+import { createAssetModule } from './modules/asset';
+import { createAuthModule } from './modules/auth';
+import { createBillingModule } from './modules/billing';
+import { createDashboardModule } from './modules/dashboard';
+import { createLibraryModule } from './modules/library';
+import { createNewsModule } from './modules/news';
+import { createProjectModule } from './modules/project';
+import { createReferenceModule } from './modules/reference';
+import { createTaskModule } from './modules/task';
+import {
+  createHttpClient,
+  type CreateHttpClientOptions,
+  type HttpRequestConfig,
+} from './http';
 
-export interface ApiClientOptions {
-  baseUrl: string;
-  fetcher?: typeof fetch;
+export interface SdkClientOptions extends CreateHttpClientOptions {
+  transport?: (config: HttpRequestConfig) => Promise<{ data: unknown }>;
 }
 
-export function createApiClient(options: ApiClientOptions) {
-  const baseUrl = options.baseUrl.replace(/\/$/, '');
-  const fetcher = options.fetcher ?? fetch;
+export function createSdkClient(options: SdkClientOptions) {
+  const http = createHttpClient(options);
+  const auth = createAuthModule(http);
+  const dashboard = createDashboardModule(http);
+  const news = createNewsModule(http);
+  const project = createProjectModule(http);
+  const task = createTaskModule(http);
+  const library = createLibraryModule(http);
+  const asset = createAssetModule(http);
+  const reference = createReferenceModule(http);
+  const billing = createBillingModule(http);
 
   return {
-    async getHealth(): Promise<HealthResponse> {
-      const response = await fetcher(`${baseUrl}/api/health`);
-
-      if (!response.ok) {
-        throw new Error(`Health request failed with status ${response.status}`);
-      }
-
-      const payload = await response.json();
-
-      if (!isHealthResponse(payload)) {
-        throw new Error('Invalid health response payload');
-      }
-
-      return payload;
-    },
+    auth,
+    dashboard,
+    news,
+    project,
+    task,
+    library,
+    asset,
+    reference,
+    billing,
+    getHealth: dashboard.getHealth,
   };
 }
+
+export const createApiClient = createSdkClient;
+
+export type ApiClientOptions = SdkClientOptions;

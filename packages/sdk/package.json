@@ -13,7 +13,8 @@
     }
   },
   "dependencies": {
-    "@make-video/shared": "workspace:*"
+    "@make-video/shared": "workspace:*",
+    "axios": "^1.12.2"
   },
   "devDependencies": {
     "@make-video/eslint-config": "workspace:*",
