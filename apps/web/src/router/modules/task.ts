@@ -1,10 +1,10 @@
 import type { RouteRecordRaw } from 'vue-router';
-import HomeView from '../../views/HomeView.vue';
+import TaskCenterView from '../../views/task/TaskCenterView.vue';
 
 export const taskRoutes: RouteRecordRaw[] = [
   {
     path: 'tasks',
     name: 'task-center',
-    component: HomeView,
+    component: TaskCenterView,
   },
 ];

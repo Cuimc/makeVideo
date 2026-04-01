@@ -1,6 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router';
 import AiWorkspaceView from '../../views/project/AiWorkspaceView.vue';
-import HomeView from '../../views/HomeView.vue';
+import VideoGenerateView from '../../views/project/VideoGenerateView.vue';
 
 export const projectRoutes: RouteRecordRaw[] = [
   {
@@ -11,6 +11,6 @@ export const projectRoutes: RouteRecordRaw[] = [
   {
     path: 'projects/:projectId/video',
     name: 'project-video-generate',
-    component: HomeView,
+    component: VideoGenerateView,
   },
 ];
