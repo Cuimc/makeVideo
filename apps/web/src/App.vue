@@ -5,6 +5,7 @@ import {
   NMessageProvider,
   NNotificationProvider,
 } from 'naive-ui';
+import DeleteConfirmDialog from './components/common/DeleteConfirmDialog.vue';
 import { appThemeOverrides } from './styles/theme';
 </script>
 
@@ -14,6 +15,7 @@ import { appThemeOverrides } from './styles/theme';
       <NDialogProvider>
         <NMessageProvider>
           <RouterView />
+          <DeleteConfirmDialog />
         </NMessageProvider>
       </NDialogProvider>
     </NNotificationProvider>

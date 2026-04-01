@@ -1,10 +1,10 @@
 import type { RouteRecordRaw } from 'vue-router';
-import HomeView from '../../views/HomeView.vue';
+import LibraryView from '../../views/library/LibraryView.vue';
 
 export const libraryRoutes: RouteRecordRaw[] = [
   {
     path: 'library',
     name: 'library',
-    component: HomeView,
+    component: LibraryView,
   },
 ];

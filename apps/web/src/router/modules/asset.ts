@@ -1,10 +1,10 @@
 import type { RouteRecordRaw } from 'vue-router';
-import HomeView from '../../views/HomeView.vue';
+import AssetLibraryView from '../../views/asset/AssetLibraryView.vue';
 
 export const assetRoutes: RouteRecordRaw[] = [
   {
     path: 'assets',
     name: 'asset-library',
-    component: HomeView,
+    component: AssetLibraryView,
   },
 ];
