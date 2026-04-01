@@ -1,5 +1,12 @@
 export type PointRecordType = 'recharge' | 'consume' | 'refund';
 
+export interface BillingSummary {
+  balance: number;
+  totalRecharged: number;
+  totalConsumed: number;
+  totalRefunded: number;
+}
+
 export interface PointPackage {
   id: string;
   points: number;

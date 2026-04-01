@@ -1,15 +1,16 @@
 import type { RouteRecordRaw } from 'vue-router';
-import HomeView from '../../views/HomeView.vue';
+import RechargeView from '../../views/billing/RechargeView.vue';
+import PointHistoryView from '../../views/billing/PointHistoryView.vue';
 
 export const billingRoutes: RouteRecordRaw[] = [
   {
     path: 'billing/recharge',
     name: 'billing-recharge',
-    component: HomeView,
+    component: RechargeView,
   },
   {
     path: 'billing/history',
     name: 'billing-history',
-    component: HomeView,
+    component: PointHistoryView,
   },
 ];
