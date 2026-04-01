@@ -1,10 +1,10 @@
 import type { RouteRecordRaw } from 'vue-router';
-import HomeView from '../../views/HomeView.vue';
+import NewsTopicView from '../../views/news/NewsTopicView.vue';
 
 export const newsRoutes: RouteRecordRaw[] = [
   {
     path: 'news/topics',
     name: 'news-topics',
-    component: HomeView,
+    component: NewsTopicView,
   },
 ];
