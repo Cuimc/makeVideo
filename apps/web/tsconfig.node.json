@@ -1,0 +1,7 @@
+{
+  "extends": "@make-video/tsconfig/web",
+  "compilerOptions": {
+    "composite": true
+  },
+  "include": ["vite.config.ts", "vitest.config.ts", "uno.config.ts"]
+}

@@ -1,0 +1,14 @@
+{
+  "extends": "@make-video/tsconfig/web",
+  "compilerOptions": {
+    "baseUrl": "."
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "src/**/*.d.ts",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "uno.config.ts"
+  ]
+}
