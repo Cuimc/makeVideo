@@ -4,7 +4,7 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { configureApp } from '../src/bootstrap';
 
-describe('Health endpoint (e2e)', () => {
+describe('Swagger docs (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -21,14 +21,11 @@ describe('Health endpoint (e2e)', () => {
     await app.close();
   });
 
-  it('returns the service health payload', async () => {
-    const response = await request(app.getHttpServer()).get('/api/health');
+  it('exposes the OpenAPI json document', async () => {
+    const response = await request(app.getHttpServer()).get('/docs-json');
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({
-      status: 'ok',
-      service: 'make-video-server',
-      timestamp: expect.any(String),
-    });
+    expect(response.body.openapi).toBe('3.0.0');
+    expect(response.body.paths['/api/health']).toBeDefined();
   });
 });

@@ -20,6 +20,7 @@
     "eslint-plugin-vue": "^10.5.1",
     "globals": "^16.4.0",
     "prettier": "^3.5.3",
+    "prisma": "^6.7.0",
     "tsup": "^8.4.0",
     "turbo": "^2.5.0",
     "typescript": "^5.8.3",
