@@ -4,7 +4,7 @@
   "packageManager": "pnpm@10.19.0",
   "scripts": {
     "predev": "pnpm --filter @make-video/shared build && pnpm --filter @make-video/sdk build",
-    "dev": "turbo run dev --parallel --filter=@make-video/shared --filter=@make-video/sdk --filter=@make-video/server --filter=@make-video/web",
+    "dev": "turbo run dev --filter=@make-video/shared --filter=@make-video/sdk --filter=@make-video/server --filter=@make-video/web",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
