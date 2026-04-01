@@ -1,0 +1,11 @@
+{
+  "name": "@make-video/tsconfig",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./base": "./base.json",
+    "./web": "./web.json",
+    "./server": "./server.json",
+    "./library": "./library.json"
+  }
+}
