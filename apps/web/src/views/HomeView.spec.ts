@@ -1,17 +1,40 @@
 import { createPinia } from 'pinia';
-import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import { flushPromises, mount } from '@vue/test-utils';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import HomeView from './HomeView.vue';
 
+const { getHealth } = vi.hoisted(() => ({
+  getHealth: vi.fn(),
+}));
+
+vi.mock('../apis/client', () => ({
+  apiClient: {
+    getHealth,
+  },
+}));
+
 describe('HomeView', () => {
-  it('renders the monorepo dashboard title', () => {
+  beforeEach(() => {
+    getHealth.mockReset();
+  });
+
+  it('renders backend health status loaded through the sdk client', async () => {
+    getHealth.mockResolvedValue({
+      status: 'ok',
+      service: 'make-video-server',
+      timestamp: '2026-04-01T00:00:00.000Z',
+    });
+
     const wrapper = mount(HomeView, {
       global: {
         plugins: [createPinia()],
       },
     });
 
-    expect(wrapper.text()).toContain('Make Video Console');
-    expect(wrapper.text()).toContain('前后端 Monorepo 已初始化');
+    await flushPromises();
+
+    expect(getHealth).toHaveBeenCalledTimes(1);
+    expect(wrapper.text()).toContain('API 状态ok');
+    expect(wrapper.text()).toContain('服务名make-video-server');
   });
 });

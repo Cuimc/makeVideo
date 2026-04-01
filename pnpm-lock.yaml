@@ -123,6 +123,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@make-video/sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk
       naive-ui:
         specifier: ^2.43.1
         version: 2.44.1(vue@3.5.31(typescript@5.9.3))
