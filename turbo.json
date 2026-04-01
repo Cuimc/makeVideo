@@ -7,7 +7,7 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".vite/**", "coverage/**"]
+      "outputs": ["dist/**", ".vite/**"]
     },
     "lint": {
       "outputs": []
@@ -18,7 +18,7 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
+      "outputs": []
     },
     "clean": {
       "cache": false

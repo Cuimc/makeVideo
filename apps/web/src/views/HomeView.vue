@@ -21,19 +21,38 @@ onMounted(() => {
       <NCard title="控制台概览">
         <div class="space-y-6">
           <div>
-            <h1 class="text-3xl font-bold">{{ title }}</h1>
-            <p class="mt-2 text-base text-slate-600">{{ subtitle }}</p>
+            <h1 class="text-3xl font-bold">
+              {{ title }}
+            </h1>
+            <p class="mt-2 text-base text-slate-600">
+              {{ subtitle }}
+            </p>
           </div>
 
-          <NTag type="success" size="large">
+          <NTag
+            type="success"
+            size="large"
+          >
             Vue 3 + Vite + Pinia + Router + UnoCSS
           </NTag>
 
-          <NDescriptions bordered :column="1" label-placement="left">
-            <NDescriptionsItem label="API 状态">{{ status }}</NDescriptionsItem>
-            <NDescriptionsItem label="服务名">{{ service }}</NDescriptionsItem>
-            <NDescriptionsItem label="时间戳">{{ timestamp }}</NDescriptionsItem>
-            <NDescriptionsItem label="错误信息">{{ error || '无' }}</NDescriptionsItem>
+          <NDescriptions
+            bordered
+            :column="1"
+            label-placement="left"
+          >
+            <NDescriptionsItem label="API 状态">
+              {{ status }}
+            </NDescriptionsItem>
+            <NDescriptionsItem label="服务名">
+              {{ service }}
+            </NDescriptionsItem>
+            <NDescriptionsItem label="时间戳">
+              {{ timestamp }}
+            </NDescriptionsItem>
+            <NDescriptionsItem label="错误信息">
+              {{ error || '无' }}
+            </NDescriptionsItem>
           </NDescriptions>
         </div>
       </NCard>
