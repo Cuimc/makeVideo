@@ -1,42 +1,42 @@
-# Monorepo Project Framework Design
+# Monorepo 项目框架设计
 
-Date: 2026-04-01
+日期：2026-04-01
 
-## Context
+## 背景
 
-This repository is currently empty and needs a lightweight but stable monorepo foundation for two initial applications:
+当前仓库还是空仓库，需要先搭建一个轻量但稳定的 monorepo 基础框架，首期只包含两个应用：
 
-- `apps/web`: frontend based on Vue 3, Vite, TypeScript, Naive UI, Pinia, Vue Router, and UnoCSS
-- `apps/server`: backend based on NestJS, Prisma, MySQL, Redis, BullMQ, JWT, and Swagger
+- `apps/web`：前端，技术栈为 Vue 3、Vite、TypeScript、Naive UI、Pinia、Vue Router、UnoCSS
+- `apps/server`：后端，技术栈为 NestJS、Prisma、MySQL、Redis、BullMQ、JWT、Swagger
 
-The user explicitly wants a lightweight setup that remains stable and does not introduce unnecessary platform complexity.
+用户已经明确要求第一版以“轻量、稳定、不过度设计”为原则，不引入不必要的平台复杂度。
 
-## Goals
+## 目标
 
-- Establish a `pnpm workspace` monorepo with `turbo` for task orchestration
-- Keep the first version focused on two applications plus a small set of shared packages
-- Separate application code, shared business-agnostic code, and shared engineering configuration
-- Make local development ergonomic from the repository root
-- Ensure the structure can grow without forcing a reorganization after the first few features
+- 使用 `pnpm workspace` 建立 monorepo，并用 `turbo` 进行任务编排
+- 第一版只聚焦两个应用和少量共享包
+- 明确区分应用代码、共享业务无关代码、共享工程配置
+- 支持从仓库根目录进行统一开发、构建和校验
+- 为后续功能扩展预留合理空间，避免很快重新整理目录结构
 
-## Non-Goals
+## 非目标
 
-- Do not introduce CI/CD, release automation, or package publishing workflows in the first version
-- Do not over-model future domains with many empty packages
-- Do not implement business modules beyond the minimum backend integration points
-- Do not add full end-to-end testing infrastructure in the first version
+- 第一版不引入 CI/CD、发版流程、包发布流程
+- 第一版不为了未来假设提前拆出大量空目录或空包
+- 第一版不实现完整业务模块，只搭好基础设施接入点
+- 第一版不引入完整的端到端测试平台
 
-## Recommended Approach
+## 推荐方案
 
-Use `pnpm workspace + turbo` with:
+采用 `pnpm workspace + turbo`，并包含以下组成：
 
-- two application workspaces under `apps/`
-- four shared workspaces under `packages/`
-- one root-level `prisma/` directory for shared database infrastructure
+- `apps/` 下的两个应用工作区
+- `packages/` 下的四个共享工作区
+- 仓库根部单独维护一个 `prisma/` 目录作为统一数据库基础设施入口
 
-This balances current simplicity with predictable room for shared types, SDK generation, and centralized engineering configuration.
+这样可以在保持当前简单度的同时，为后续的共享类型、SDK 封装、工程配置复用留出明确位置。
 
-## Repository Layout
+## 仓库结构
 
 ```text
 .
@@ -57,11 +57,11 @@ This balances current simplicity with predictable room for shared types, SDK gen
 └─ turbo.json
 ```
 
-## Workspace Naming
+## Workspace 命名
 
-All workspace packages should use the `@make-video/*` scope.
+所有 workspace 包统一使用 `@make-video/*` 作用域。
 
-Recommended package names:
+推荐包名如下：
 
 - `@make-video/web`
 - `@make-video/server`
@@ -70,107 +70,108 @@ Recommended package names:
 - `@make-video/shared`
 - `@make-video/sdk`
 
-## Package Responsibilities
+## 包职责划分
 
-### Applications
+### 应用层
 
 #### `apps/web`
 
-Responsible for:
+负责内容：
 
-- Vue application bootstrap
-- route definitions
-- Pinia state management
-- Naive UI setup
-- UnoCSS setup
-- page-level and component-level UI
-- API consumption through `@make-video/sdk`
+- Vue 应用启动与注册
+- 路由定义
+- Pinia 状态管理
+- Naive UI 接入
+- UnoCSS 接入
+- 页面与组件层 UI
+- 通过 `@make-video/sdk` 消费后端接口
 
-Must not contain:
+不应包含：
 
-- duplicated cross-application DTO definitions
-- direct backend-specific implementation details that belong in shared packages
+- 前后端重复维护的 DTO 类型
+- 本应放在共享包中的后端实现细节
 
 #### `apps/server`
 
-Responsible for:
+负责内容：
 
-- NestJS bootstrap and module composition
-- HTTP API exposure
-- authentication with JWT
-- Swagger documentation output
-- queue integration through BullMQ
-- Prisma-based persistence and Redis-based infrastructure integration
+- NestJS 启动入口与模块组装
+- HTTP API 暴露
+- JWT 鉴权基础能力
+- Swagger 文档输出
+- BullMQ 队列接入
+- Prisma 持久化接入
+- Redis 基础设施接入
 
-Must not contain:
+不应包含：
 
-- frontend-facing request client logic
-- reusable cross-platform utilities that belong in `@make-video/shared`
+- 面向前端的请求客户端逻辑
+- 可被前后端共同复用但却留在服务端内部的工具代码
 
-### Shared Packages
+### 共享包
 
 #### `packages/tsconfig`
 
-Provides shared TypeScript configuration variants:
+提供共享的 TypeScript 配置变体：
 
 - `base.json`
 - `web.json`
 - `server.json`
 - `library.json`
 
-This package only contains TypeScript configuration and no application code.
+这个包只包含 TypeScript 配置，不包含业务代码。
 
 #### `packages/eslint-config`
 
-Provides shared ESLint configuration variants:
+提供共享的 ESLint 配置变体：
 
-- base config
-- Vue app config
-- Nest app config
+- 基础配置
+- Vue 应用配置
+- Nest 应用配置
 
-This package only contains linting configuration and no runtime code.
+这个包只包含 lint 配置，不包含运行时代码。
 
 #### `packages/shared`
 
-Provides pure TypeScript content that can be consumed by both frontend and backend, such as:
+提供前后端都能消费的纯 TypeScript 内容，例如：
 
-- common API types
-- shared constants
-- common utility types
-- schema-like definitions that do not depend on Vue or Nest runtime APIs
+- 通用 API 类型
+- 共享常量
+- 通用工具类型
+- 不依赖 Vue 或 Nest 运行时的 schema 或结构定义
 
-Rules:
+约束规则：
 
-- no Vue-specific imports
-- no Nest-specific imports
-- no Node-only runtime dependencies unless they are safe and intentional for all consumers
+- 不允许引入 Vue 专属依赖
+- 不允许引入 Nest 专属依赖
+- 不允许引入仅能在 Node 环境运行的依赖，除非该依赖明确适用于所有消费方
 
 #### `packages/sdk`
 
-Provides the frontend-facing API access layer.
+提供给前端消费的统一 API 访问层。
 
-Initial responsibilities:
+第一版职责：
 
-- central API client creation
-- typed request wrappers grouped by backend module
-- integration point for future Swagger/OpenAPI-based client generation
+- 统一创建 API Client
+- 按模块组织的类型化请求封装
+- 作为未来 Swagger/OpenAPI 代码生成客户端的接入位置
 
-Rules:
+约束规则：
 
-- expose an interface that `apps/web` can consume directly
-- keep business state out of this package
-- allow future migration from handwritten clients to generated clients without changing frontend call sites broadly
+- 要向 `apps/web` 提供稳定、直接可消费的接口
+- 不承载业务状态
+- 后续即使从手写客户端切到代码生成客户端，也应尽量不影响前端调用层
 
-## Root Tooling Strategy
+## 根目录工具链策略
 
-### Package Manager
+### 包管理器
 
-- Use `pnpm` as the workspace package manager
-- Pin a single LTS Node version, recommended: `Node 22`
+- 使用 `pnpm` 作为 workspace 包管理器
+- 固定一个 LTS Node 版本，建议为 `Node 22`
 
-### Root Dependencies
+### 根依赖
 
-Keep only repository-wide development tooling at the root, such as:
+根目录只放全仓通用的开发依赖，例如：
 
 - `turbo`
 - `typescript`
@@ -179,11 +180,11 @@ Keep only repository-wide development tooling at the root, such as:
 - `husky`
 - `lint-staged`
 
-Application runtime dependencies stay in their own workspaces.
+应用运行时依赖放在各自 workspace 内部，不放到根目录。
 
-### Root Scripts
+### 根脚本
 
-The root `package.json` should expose only common entry points:
+根 `package.json` 只暴露全仓统一入口：
 
 - `dev`
 - `build`
@@ -193,28 +194,28 @@ The root `package.json` should expose only common entry points:
 - `format`
 - `clean`
 
-The root is a coordination layer and should not contain business scripts.
+根目录的职责是调度与规范，不承载业务逻辑。
 
-## Turbo Pipeline Design
+## Turbo 任务编排设计
 
-The first version of `turbo.json` should define a small task graph:
+第一版 `turbo.json` 只定义一组精简任务：
 
-- `dev`: long-running, uncached
-- `build`: cached, depends on upstream package builds
-- `lint`: cached where appropriate
-- `typecheck`: cached where appropriate
-- `test`: uncached or minimally cached depending on tool defaults
-- `clean`: uncached
+- `dev`：长驻进程，不缓存
+- `build`：可缓存，依赖上游包的构建
+- `lint`：按需要缓存
+- `typecheck`：按需要缓存
+- `test`：不缓存或仅按工具默认方式轻量缓存
+- `clean`：不缓存
 
-Behavioral expectations:
+行为要求：
 
-- packages such as `@make-video/shared` and `@make-video/sdk` complete before downstream app build and typecheck tasks
-- `dev` runs independently for each app and is not treated as a cacheable artifact
-- only deterministic tasks are included in caching
+- `@make-video/shared`、`@make-video/sdk` 等上游包应先于应用层完成 `build` / `typecheck`
+- `dev` 阶段前后端各自独立运行，不视为可缓存产物
+- 只对确定性任务启用缓存
 
-## Frontend Application Design
+## 前端应用设计
 
-### Proposed Structure
+### 建议目录结构
 
 ```text
 apps/web/
@@ -236,16 +237,16 @@ apps/web/
 └─ uno.config.ts
 ```
 
-### Frontend Responsibilities
+### 前端职责说明
 
-- `main.ts` mounts the Vue app and registers Pinia, Vue Router, Naive UI, and UnoCSS
-- `apis/` consumes `@make-video/sdk` instead of building ad hoc request logic everywhere
-- `stores/` contains frontend state, not low-level HTTP details
-- `views/` and `components/` own presentation concerns
+- `main.ts` 负责挂载 Vue 应用，并注册 Pinia、Vue Router、Naive UI、UnoCSS
+- `apis/` 通过 `@make-video/sdk` 访问接口，而不是在各页面分散拼接请求逻辑
+- `stores/` 只负责前端状态，不承担底层 HTTP 细节
+- `views/` 与 `components/` 负责页面与展示逻辑
 
-## Backend Application Design
+## 后端应用设计
 
-### Proposed Structure
+### 建议目录结构
 
 ```text
 apps/server/
@@ -265,54 +266,52 @@ apps/server/
 └─ nest-cli.json
 ```
 
-### Backend Responsibilities
+### 后端职责说明
 
-- `main.ts` configures bootstrap concerns such as global prefix, validation, and Swagger
-- `app.module.ts` assembles core modules
-- `modules/auth/` provides JWT-based authentication foundations
-- `modules/health/` exposes a basic health endpoint for local verification
-- `modules/queue/` owns BullMQ integration wiring
-- `prisma/` provides Prisma service access for Nest consumers
-- `redis/` provides shared Redis connection access
+- `main.ts` 负责启动阶段配置，例如全局前缀、参数校验、Swagger
+- `app.module.ts` 负责聚合核心模块
+- `modules/auth/` 提供 JWT 鉴权基础能力
+- `modules/health/` 提供基础健康检查接口，便于本地联调验证
+- `modules/queue/` 负责 BullMQ 接线
+- `prisma/` 提供给 Nest 使用的 Prisma Service
+- `redis/` 提供 Redis 连接封装
 
-The first version should expose infrastructure entry points without forcing full business modules.
+第一版的目标是先把基础设施入口搭好，而不是提前铺满业务模块。
 
-## Prisma Location
+## Prisma 放置位置
 
-Use a root-level `prisma/` directory rather than embedding it in `apps/server`.
+推荐把 `prisma/` 放在仓库根目录，而不是塞进 `apps/server`。
 
-Reasons:
+原因：
 
-- database schema and migrations are repository-wide infrastructure
-- generated outputs and scripts can be coordinated centrally
-- future workspace consumers can reference the database layer without relocating schema assets
+- 数据库 schema 和 migration 属于全仓级基础设施
+- 生成逻辑、脚本和后续维护可以集中管理
+- 后续如果有其他 workspace 也需要引用数据库定义，无需再次迁移目录
 
-The backend remains the primary runtime consumer, but the schema should live at the repository root.
+服务端仍然是主要运行时消费者，但 schema 资产放在根目录更合理。
 
-## Data Flow Boundaries
+## 数据流边界
 
-The intended request flow is:
+建议的数据流如下：
 
-1. `apps/web` view or store calls `@make-video/sdk`
-2. `@make-video/sdk` performs typed HTTP requests to `apps/server`
-3. `apps/server` routes requests through controller -> service -> persistence/infrastructure
-4. shared types and constants flow through `@make-video/shared`
+1. `apps/web` 的页面或 store 调用 `@make-video/sdk`
+2. `@make-video/sdk` 向 `apps/server` 发起类型化 HTTP 请求
+3. `apps/server` 按 `controller -> service -> persistence/infrastructure` 路径处理请求
+4. 前后端共享的类型、常量等通过 `@make-video/shared` 提供
 
-This keeps frontend code decoupled from Nest internals and preserves a stable contract surface between applications.
+这样可以让前端不直接耦合 Nest 内部实现，同时把跨端契约固定在稳定边界上。
 
-## Environment Variable Strategy
+## 环境变量策略
 
-Do not commit real secrets. Commit only example files.
+不提交真实密钥，只提交示例文件。
 
-Recommended files:
+建议文件：
 
 - `.env.example`
 - `apps/web/.env.example`
 - `apps/server/.env.example`
 
-### Backend Variables
-
-Minimum backend variables:
+### 后端最小变量集合
 
 - `PORT`
 - `DATABASE_URL`
@@ -320,62 +319,60 @@ Minimum backend variables:
 - `JWT_SECRET`
 - `SWAGGER_PATH`
 
-### Frontend Variables
-
-Minimum frontend variables:
+### 前端最小变量集合
 
 - `VITE_API_BASE_URL`
 
-## Testing Strategy
+## 测试策略
 
-The first version should keep testing intentionally small:
+第一版测试保持精简：
 
-- frontend uses `Vitest`
-- backend uses the Nest default Jest-based test setup
-- root scripts expose `test`, `lint`, and `typecheck` for full-repository execution
+- 前端使用 `Vitest`
+- 后端使用 Nest 默认的 Jest 测试体系
+- 根目录统一暴露 `test`、`lint`、`typecheck`
 
-Do not introduce full e2e orchestration in the initial scaffold.
+第一版不引入完整的端到端测试编排。
 
-## Initial Scope of Implementation
+## 第一阶段实施范围
 
-The scaffold phase should include:
+脚手架阶段应包含：
 
-- repository root workspace setup
-- Turbo configuration
-- shared config packages
-- frontend app scaffold wired with Vue 3, Vite, TypeScript, Naive UI, Pinia, Vue Router, and UnoCSS
-- backend app scaffold wired with NestJS, Prisma, MySQL, Redis, BullMQ, JWT, and Swagger integration points
-- shared package placeholders with clear exported entry points
-- a minimal health endpoint reachable from the backend
-- a minimal frontend integration path that can call the backend through the SDK layer
+- 仓库根目录 workspace 初始化
+- Turbo 配置
+- 共享工程配置包
+- 前端应用骨架，接入 Vue 3、Vite、TypeScript、Naive UI、Pinia、Vue Router、UnoCSS
+- 后端应用骨架，接入 NestJS、Prisma、MySQL、Redis、BullMQ、JWT、Swagger 的基础入口
+- 共享包占位与明确导出入口
+- 一个可访问的后端健康检查接口
+- 一个通过 SDK 调用后端接口的最小前端接入路径
 
-The scaffold phase should not include:
+脚手架阶段不包含：
 
-- feature-complete auth flows
-- production-grade queue workflows
-- fully modeled domain modules
-- deployment automation
+- 完整鉴权流程
+- 生产级队列业务流
+- 完整领域模块建模
+- 部署自动化
 
-## Acceptance Criteria
+## 验收标准
 
-The monorepo scaffold is acceptable when all of the following are true:
+以下条件同时满足时，monorepo 骨架可视为通过验收：
 
-- `pnpm dev` can start the frontend and backend from the repository root
-- `pnpm build` works across all buildable workspaces
-- `pnpm lint` runs from the repository root
-- `pnpm typecheck` runs from the repository root
-- `pnpm test` runs from the repository root
-- the backend exposes a health endpoint
-- Swagger UI is reachable from the backend runtime
-- the frontend is structured to consume backend APIs through `@make-video/sdk`
-- shared configuration packages are consumed by downstream workspaces instead of duplicated locally
+- `pnpm dev` 可以从仓库根目录同时启动前端和后端
+- `pnpm build` 可以覆盖所有可构建 workspace
+- `pnpm lint` 可以从仓库根目录执行
+- `pnpm typecheck` 可以从仓库根目录执行
+- `pnpm test` 可以从仓库根目录执行
+- 后端暴露基础健康检查接口
+- Swagger UI 可访问
+- 前端已按 `@make-video/sdk` 方式消费后端接口
+- 下游 workspace 复用了共享配置包，而不是各自复制配置
 
-## Implementation Notes for the Next Step
+## 下一阶段实施说明
 
-The implementation plan should favor:
+下一阶段的实现计划应优先遵循以下原则：
 
-- lightweight initialization over full platform automation
-- clear boundaries over speculative abstraction
-- enough scaffolding to make the first business feature cheap to add
+- 轻量初始化，不做平台化过度建设
+- 边界清晰，避免为了“未来可能会用到”而过度抽象
+- 搭出足够稳定的骨架，让第一个业务功能接入成本低
 
-The next phase should produce a concrete execution plan before any application code is scaffolded.
+在真正开始搭建应用代码之前，下一步应先输出具体的实施计划。
