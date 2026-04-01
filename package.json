@@ -1,0 +1,25 @@
+{
+  "name": "make-video",
+  "private": true,
+  "packageManager": "pnpm@10.19.0",
+  "scripts": {
+    "predev": "pnpm --filter @make-video/shared build && pnpm --filter @make-video/sdk build",
+    "dev": "turbo run dev --parallel --filter=@make-video/shared --filter=@make-video/sdk --filter=@make-video/server --filter=@make-video/web",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "prettier --write .",
+    "clean": "turbo run clean"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.30",
+    "@vitest/coverage-v8": "^3.0.8",
+    "eslint": "^9.24.0",
+    "prettier": "^3.5.3",
+    "tsup": "^8.4.0",
+    "turbo": "^2.5.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.0.8"
+  }
+}
