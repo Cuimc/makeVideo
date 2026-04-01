@@ -1,0 +1,12 @@
+{
+  "extends": "@make-video/tsconfig/server",
+  "compilerOptions": {
+    "declaration": true,
+    "outDir": "./dist",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "types": ["node", "jest"]
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}
