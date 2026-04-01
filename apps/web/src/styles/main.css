@@ -1,6 +1,6 @@
 :root {
-  color: #0f172a;
-  background: #f8fafc;
+  color: #374151;
+  background: #f9fafb;
   font-family:
     'PingFang SC',
     'Hiragino Sans GB',
@@ -10,4 +10,19 @@
 
 body {
   margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #374151;
+  background: #f9fafb;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+#app {
+  min-height: 100vh;
 }
