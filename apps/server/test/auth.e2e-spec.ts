@@ -77,4 +77,14 @@ describe('Auth module (e2e)', () => {
 
     expect(profileResponse.body.data.maskedPhone).toBe('138****8000');
   });
+
+  it('supports dev login without sending code first', async () => {
+    const loginResponse = await request(app.getHttpServer())
+      .post('/api/auth/login')
+      .send({ phone: '13800138000', code: '123456' })
+      .expect(200);
+
+    expect(loginResponse.body.data.token).toEqual(expect.any(String));
+    expect(loginResponse.body.data.profile.phone).toBe('13800138000');
+  });
 });

@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import type { FormInst, FormRules } from 'naive-ui';
-import { NButton, NCard, NForm, NFormItem, NInput, useMessage } from 'naive-ui';
+import {
+  NAlert,
+  NButton,
+  NCard,
+  NForm,
+  NFormItem,
+  NInput,
+  useMessage,
+} from 'naive-ui';
 import { useRouter } from 'vue-router';
 import AuthLayout from '../../layouts/AuthLayout.vue';
 import { useAuthStore } from '../../stores/auth';
@@ -16,6 +24,7 @@ const message = useMessage();
 const authStore = useAuthStore();
 const formRef = ref<FormInst | null>(null);
 const submitting = ref(false);
+const devLoginEnabled = import.meta.env.DEV;
 
 const form = reactive<LoginFormModel>({
   phone: '',
@@ -72,6 +81,14 @@ async function handleSubmit() {
         :rules="rules"
         label-placement="top"
       >
+        <NAlert
+          v-if="devLoginEnabled"
+          type="info"
+          class="mb-4"
+        >
+          开发调试可直接使用手机号 13800138000 和验证码 123456 登录，无需先发送验证码。
+        </NAlert>
+
         <NFormItem
           label="手机号"
           path="phone"
