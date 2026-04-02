@@ -7,7 +7,7 @@ const DEMO_USER: UserProfile = {
   phone: '13800138000',
   maskedPhone: '138****8000',
   nickname: 'Demo User',
-  pointBalance: 3000,
+  pointBalance: 2680,
   createdAt: '2026-04-01T00:00:00.000Z',
 };
 

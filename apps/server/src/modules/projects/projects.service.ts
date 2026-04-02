@@ -2,17 +2,62 @@ import type {
   CreateProjectPayload,
   ProjectCreationResult,
   ProjectDetail,
+  ProjectListItem,
   SaveProjectDraftPayload,
   ScriptGenerationResult,
   StoryboardGenerationResult,
   StoryboardScene,
 } from '@make-video/shared';
+import type { NewsItem } from '@make-video/shared';
 import { Injectable } from '@nestjs/common';
 import { BusinessException } from '../../common/exceptions/business.exception';
 import { NewsService } from '../news/news.service';
 import { DEFAULT_PROJECT_FORM } from './project-defaults';
 
-const projects = new Map<string, ProjectDetail & { ownerId: string }>();
+const DEMO_OWNER_ID = 'user_demo';
+const DEMO_PROJECT_ID = 'project_1';
+const DEMO_NEWS_ITEMS: NewsItem[] = [
+  {
+    id: 'seed-news-1',
+    title: '机器人养老成为社区服务新热点',
+    summary: '多地开始试点机器人养老服务，市场关注度持续上升。',
+    source: '科技日报',
+    publishedAt: '2026-04-01T08:30:00.000Z',
+    keyword: '养老',
+    url: 'https://example.com/news/seed-news-1',
+  },
+];
+
+const projects = new Map<string, ProjectDetail & { ownerId: string }>([
+  [
+    DEMO_PROJECT_ID,
+    {
+      id: DEMO_PROJECT_ID,
+      ownerId: DEMO_OWNER_ID,
+      name: '机器人养老趋势解读',
+      keyword: '养老',
+      status: 'script_confirmed',
+      newsItems: DEMO_NEWS_ITEMS,
+      form: { ...DEFAULT_PROJECT_FORM },
+      scriptDraft:
+        'Opening: 机器人养老正在从概念走向真实场景。\nBody: 政策与需求共同推动市场增长。',
+      storyboardDraft: [
+        {
+          id: 'scene_1',
+          title: '趋势引入',
+          durationSeconds: 10,
+          visualPrompt: '社区养老中心与服务机器人同框',
+          narration: '机器人养老正在从概念走向真实场景。',
+          subtitle: '趋势正在落地',
+        },
+      ],
+      referenceImageIds: ['image_1'],
+      referenceVideoIds: ['reference_video_1'],
+      referenceResultIds: ['reference_1'],
+      updatedAt: '2026-04-01T10:30:00.000Z',
+    },
+  ],
+]);
 
 @Injectable()
 export class ProjectsService {
@@ -71,6 +116,19 @@ export class ProjectsService {
     const detail = this.getOwnedProject(userId, projectId);
 
     return sanitizeProjectDetail(detail);
+  }
+
+  listByUser(userId: string): ProjectListItem[] {
+    return Array.from(projects.values())
+      .filter((project) => project.ownerId === userId)
+      .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+      .map((project) => ({
+        id: project.id,
+        name: project.name,
+        keyword: project.keyword,
+        status: project.status,
+        updatedAt: project.updatedAt,
+      }));
   }
 
   saveDraft(
