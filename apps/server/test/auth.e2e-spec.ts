@@ -4,7 +4,7 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { configureApp } from '../src/bootstrap';
 
-describe('Health endpoint (e2e)', () => {
+describe('Auth module (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -21,18 +21,14 @@ describe('Health endpoint (e2e)', () => {
     await app.close();
   });
 
-  it('returns the service health payload', async () => {
-    const response = await request(app.getHttpServer()).get('/api/health');
+  it('wraps unauthorized response with unified envelope', async () => {
+    const response = await request(app.getHttpServer()).get('/api/users/me');
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(401);
     expect(response.body).toEqual({
-      code: 0,
-      message: 'ok',
-      data: {
-        status: 'ok',
-        service: 'make-video-server',
-        timestamp: expect.any(String),
-      },
+      code: 401,
+      message: 'Unauthorized',
+      data: null,
     });
   });
 });

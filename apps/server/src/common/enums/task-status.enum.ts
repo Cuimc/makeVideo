@@ -1,0 +1,11 @@
+export const TASK_STATUS = {
+  PENDING_SUBMIT: 'PENDING_SUBMIT',
+  QUEUED: 'QUEUED',
+  GENERATING: 'GENERATING',
+  SUCCESS: 'SUCCESS',
+  PARTIAL_SUCCESS: 'PARTIAL_SUCCESS',
+  FAILED: 'FAILED',
+  CANCELED: 'CANCELED',
+} as const;
+
+export type TaskStatus = (typeof TASK_STATUS)[keyof typeof TASK_STATUS];
