@@ -6,3 +6,306 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+enum ProjectStatus {
+  CREATED
+  SCRIPT_GENERATING
+  SCRIPT_PENDING_CONFIRM
+  SCRIPT_CONFIRMED
+  VIDEO_GENERATING
+  COMPLETED
+  FAILED
+}
+
+enum VideoTaskStatus {
+  PENDING
+  QUEUED
+  PROCESSING
+  SUCCESS
+  PARTIAL_SUCCESS
+  FAILED
+  CANCELED
+}
+
+enum ReferenceAnalysisStatus {
+  PENDING
+  PROCESSING
+  SUCCESS
+  FAILED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  CLOSED
+}
+
+enum PointTransactionType {
+  RECHARGE
+  FREEZE
+  CONSUME
+  REFUND
+}
+
+model User {
+  id              String             @id @default(cuid())
+  phone           String             @unique
+  nickname        String
+  authCodes       UserAuthCode[]
+  pointAccount    PointAccount?
+  pointTransactions PointTransaction[]
+  projects        Project[]
+  assets          Asset[]
+  referenceVideos ReferenceVideo[]
+  rechargeOrders  RechargeOrder[]
+  videoTasks      VideoGenerateTask[]
+  videos          Video[]
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+}
+
+model UserAuthCode {
+  id         String   @id @default(cuid())
+  phone      String
+  code       String
+  purpose    String   @default("LOGIN")
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime @default(now())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([phone, purpose, createdAt])
+}
+
+model PointAccount {
+  id              String             @id @default(cuid())
+  userId          String             @unique
+  availablePoints Int                @default(0)
+  frozenPoints    Int                @default(0)
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions    PointTransaction[]
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+}
+
+model PointTransaction {
+  id           String               @id @default(cuid())
+  accountId    String
+  userId       String
+  type         PointTransactionType
+  points       Int
+  balanceAfter Int
+  relatedType  String?
+  relatedId    String?
+  remark       String?
+  account      PointAccount         @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime             @default(now())
+
+  @@index([userId, type, createdAt])
+  @@index([relatedType, relatedId])
+}
+
+model RechargeOrder {
+  id                     String        @id @default(cuid())
+  userId                 String
+  orderNo                String        @unique
+  status                 PaymentStatus @default(PENDING)
+  amountCents            Int
+  points                 Int
+  provider               String        @default("MOCK")
+  providerOrderId        String?       @unique
+  callbackIdempotencyKey String?       @unique
+  paidAt                 DateTime?
+  closedAt               DateTime?
+  user                   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  @@index([userId, status, createdAt])
+}
+
+model Project {
+  id              String              @id @default(cuid())
+  userId          String
+  title           String
+  keyword         String
+  status          ProjectStatus       @default(CREATED)
+  description     String?
+  coverImageUrl   String?
+  form            Json?
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  news            ProjectNews?
+  scripts         Script[]
+  storyboards     Storyboard[]
+  assets          Asset[]
+  referenceVideos ReferenceVideo[]
+  scriptReferences ScriptReference[]
+  videoTasks      VideoGenerateTask[]
+  videos          Video[]
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@index([userId, status, createdAt])
+}
+
+model ProjectNews {
+  id             String   @id @default(cuid())
+  projectId      String   @unique
+  externalNewsId String?
+  title          String
+  summary        String?
+  source         String?
+  publishedAt    DateTime?
+  url            String?
+  rawPayload     Json?
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Script {
+  id                String   @id @default(cuid())
+  projectId         String
+  version           Int
+  title             String?
+  content           Json
+  sourceNewsSummary String?
+  isCurrent         Boolean  @default(true)
+  project           Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([projectId, version])
+  @@index([projectId, isCurrent, createdAt])
+}
+
+model Storyboard {
+  id        String   @id @default(cuid())
+  projectId String
+  version   Int
+  title     String?
+  content   Json
+  isCurrent Boolean  @default(true)
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, version])
+  @@index([projectId, isCurrent, createdAt])
+}
+
+model Asset {
+  id         String    @id @default(cuid())
+  userId     String
+  projectId  String?
+  name       String
+  mimeType   String
+  sizeBytes  Int
+  storageKey String
+  url        String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project    Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+
+  @@index([userId, projectId, deletedAt, createdAt])
+}
+
+model ReferenceVideo {
+  id              String                  @id @default(cuid())
+  userId          String
+  projectId       String?
+  name            String
+  fileName        String
+  mimeType        String
+  sizeBytes       Int
+  durationSeconds Int?
+  storageKey      String
+  url             String
+  status          ReferenceAnalysisStatus @default(PENDING)
+  analysisSummary String?
+  analysisPayload Json?
+  errorMessage    String?
+  user            User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project         Project?                @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  scriptReferences ScriptReference[]
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+  deletedAt       DateTime?
+
+  @@index([userId, projectId, status, createdAt])
+}
+
+model ScriptReference {
+  id               String         @id @default(cuid())
+  projectId        String
+  referenceVideoId String
+  note             String?
+  project          Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  referenceVideo   ReferenceVideo @relation(fields: [referenceVideoId], references: [id], onDelete: Cascade)
+  createdAt        DateTime       @default(now())
+
+  @@unique([projectId, referenceVideoId])
+}
+
+model VideoGenerateTask {
+  id            String             @id @default(cuid())
+  userId        String
+  projectId     String
+  status        VideoTaskStatus    @default(PENDING)
+  pointCost     Int
+  refundPoints  Int                @default(0)
+  outputCount   Int                @default(1)
+  params        Json?
+  failureReason String?
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project       Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  items         VideoGenerateTaskItem[]
+  videos        Video[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@index([projectId, status, createdAt])
+  @@index([userId, createdAt])
+}
+
+model VideoGenerateTaskItem {
+  id           String          @id @default(cuid())
+  taskId       String
+  sequence     Int
+  status       VideoTaskStatus @default(PENDING)
+  resultUrl    String?
+  errorMessage String?
+  videoId      String?
+  task         VideoGenerateTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  video        Video?            @relation(fields: [videoId], references: [id], onDelete: SetNull)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@unique([taskId, sequence])
+  @@index([videoId])
+}
+
+model Video {
+  id              String                  @id @default(cuid())
+  userId          String
+  projectId       String
+  taskId          String?
+  title           String
+  coverUrl        String?
+  url             String
+  durationSeconds Int?
+  user            User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project         Project                 @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  task            VideoGenerateTask?      @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  taskItems       VideoGenerateTaskItem[]
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+  deletedAt       DateTime?
+
+  @@index([userId, projectId, deletedAt, createdAt])
+}
