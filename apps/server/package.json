@@ -36,6 +36,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "pretest": "pnpm --filter @make-video/shared build",
     "test": "jest --config ./test/jest-e2e.json",
+    "test:unit": "jest --config ./test/jest-unit.json",
     "prisma:validate": "prisma validate --schema ../../prisma/schema.prisma",
     "prisma:generate": "prisma generate --schema ../../prisma/schema.prisma",
     "prisma:seed": "ts-node ../../prisma/seed.ts",

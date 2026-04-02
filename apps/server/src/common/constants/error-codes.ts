@@ -7,6 +7,7 @@ export const ERROR_CODES = {
   INTERNAL_SERVER_ERROR: 500,
   VALIDATION_ERROR: 1000,
   INVALID_TOKEN: 1001,
+  INSUFFICIENT_POINTS: 4001,
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
