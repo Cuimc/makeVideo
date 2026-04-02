@@ -31,4 +31,50 @@ describe('Auth module (e2e)', () => {
       data: null,
     });
   });
+
+  it('logs in by sms code and fetches current user profile', async () => {
+    await request(app.getHttpServer())
+      .post('/api/auth/send-code')
+      .send({ phone: '13800138000' })
+      .expect(200);
+
+    const loginResponse = await request(app.getHttpServer())
+      .post('/api/auth/login-by-sms')
+      .send({ phone: '13800138000', code: '123456' })
+      .expect(200);
+
+    expect(loginResponse.body.data.token).toEqual(expect.any(String));
+    expect(loginResponse.body.data.accessToken).toBe(
+      loginResponse.body.data.token,
+    );
+
+    const token = loginResponse.body.data.token as string;
+    const profileResponse = await request(app.getHttpServer())
+      .get('/api/users/me')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    expect(profileResponse.body.data.phone).toBe('13800138000');
+    expect(profileResponse.body.data.nickname).toBe('Demo User');
+  });
+
+  it('supports sdk-compatible auth endpoints', async () => {
+    await request(app.getHttpServer())
+      .post('/api/auth/send-code')
+      .send({ phone: '13800138000' })
+      .expect(200);
+
+    const loginResponse = await request(app.getHttpServer())
+      .post('/api/auth/login')
+      .send({ phone: '13800138000', code: '123456' })
+      .expect(200);
+
+    const token = loginResponse.body.data.token as string;
+    const profileResponse = await request(app.getHttpServer())
+      .get('/api/auth/profile')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    expect(profileResponse.body.data.maskedPhone).toBe('138****8000');
+  });
 });
