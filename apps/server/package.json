@@ -30,14 +30,14 @@
     "ts-node": "^10.9.2"
   },
   "scripts": {
-    "prebuild": "pnpm --filter @make-video/shared build",
-    "predev": "pnpm --filter @make-video/shared build",
-    "pretypecheck": "pnpm --filter @make-video/shared build",
+    "prebuild": "pnpm --filter @make-video/shared build && pnpm prisma:generate",
+    "predev": "pnpm --filter @make-video/shared build && pnpm prisma:generate",
+    "pretypecheck": "pnpm --filter @make-video/shared build && pnpm prisma:generate",
     "build": "nest build",
     "dev": "nest start --watch",
     "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\"",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "pretest": "pnpm --filter @make-video/shared build",
+    "pretest": "pnpm --filter @make-video/shared build && pnpm prisma:generate",
     "test": "jest --config ./test/jest-e2e.json",
     "test:unit": "jest --config ./test/jest-unit.json",
     "prisma:validate": "prisma validate --schema ../../prisma/schema.prisma",
