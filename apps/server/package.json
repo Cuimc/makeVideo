@@ -30,6 +30,9 @@
     "ts-node": "^10.9.2"
   },
   "scripts": {
+    "prebuild": "pnpm --filter @make-video/shared build",
+    "predev": "pnpm --filter @make-video/shared build",
+    "pretypecheck": "pnpm --filter @make-video/shared build",
     "build": "nest build",
     "dev": "nest start --watch",
     "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\"",
