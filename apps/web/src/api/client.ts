@@ -4,6 +4,7 @@ import { webMockTransport } from './mock';
 
 const mockEnabled = import.meta.env.VITE_ENABLE_MOCK === 'true';
 const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+const defaultApiBaseUrl = 'http://bot-api.nibbly.cn';
 
 function resolveApiBaseUrl() {
   if (configuredBaseUrl) {
@@ -14,7 +15,7 @@ function resolveApiBaseUrl() {
     return '';
   }
 
-  return 'http://127.0.0.1:3000';
+  return defaultApiBaseUrl;
 }
 
 export const apiClient = createApiClient({
